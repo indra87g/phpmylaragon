@@ -1,4 +1,6 @@
 <?php
+require 'config.php';
+
 if (!empty($_GET['q'])) {
     switch ($_GET['q']) {
         case 'info':
@@ -12,6 +14,23 @@ if (!empty($_GET['q'])) {
 
 $dirList = glob($_SERVER['DOCUMENT_ROOT'] . '/*', GLOB_ONLYDIR);
 $totalProjects = count($dirList);
+
+$conn = new mysqli($DB_HOST, $DB_USER, $DB_PASS);
+$databases = [];
+if (!$conn->connect_error) {
+    $result = $conn->query("SHOW DATABASES");
+    while ($row = $result->fetch_assoc()) {
+        $databases[] = $row['Database'];
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
+    $newDb = $_POST['new_db'];
+    if ($conn->query("CREATE DATABASE `$newDb`")) {
+        header("Location: index.php?db_created=1");
+        exit();
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -36,7 +55,7 @@ $totalProjects = count($dirList);
     <main class="container mt-5">
         <div class="p-4 bg-body-tertiary rounded">
             <h2>Welcome to phpMyLaragon! 🚀</h2>
-            <p class="lead">Easily manage your local projects.</p>
+            <p class="lead">Laragon web dashboard for web artisans.</p>
             <button class="btn btn-primary rounded-pill px-3">Documentation</button>
             <button class="btn btn-secondary rounded-pill px-3">Laragon Pro</button>
         </div>
@@ -101,6 +120,25 @@ $totalProjects = count($dirList);
                 <button class="btn btn-danger rounded-pill"><i class="fas fa-sync"></i> Restart Server</button>
             </div>
         </div>
+
+        <br />
+
+        <?php if (!empty($databases)) : ?>
+        <div class="p-4 bg-body-tertiary rounded">
+            <h2 class="mt-4">Databases</h2>
+            <form class="mt-3" method="POST">
+                <input type="text" name="new_db" placeholder="New database name" required class="form-control"/>
+                <button type="submit" class="btn btn-primary mt-2">Create Database</button>
+            </form><br />
+            <ul class="list-group">
+            <?php foreach ($databases as $db): ?>
+                <li class="list-group-item"><a href="<?php echo $DB_URL.$db; ?>" target="_blank"> <?php echo $db; ?> </a></li>
+            <?php endforeach; ?>
+            </ul>
+        </div>
+        <?php else : ?>
+        <div class="alert alert-warning">No databases found. Check your mysql server and try again!</div>
+        <?php endif; ?>
     </main>
 
     <script>
