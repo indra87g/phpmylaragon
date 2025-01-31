@@ -13,7 +13,17 @@ if (!empty($_GET['q'])) {
 }
 
 $dirList = glob($_SERVER['DOCUMENT_ROOT'] . '/*', GLOB_ONLYDIR);
-$totalProjects = count($dirList);
+
+$ignoreList = [];
+$ignoreFile = './.projectignore';
+
+if (file_exists($ignoreFile)) {
+    $ignoreList = file($ignoreFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+}
+$filteredProjects = array_filter($dirList, function ($project) use ($ignoreList) {
+    return !in_array(basename($project), $ignoreList);
+});
+$totalProjects = count($filteredProjects);
 
 $conn = new mysqli($DB_HOST, $DB_USER, $DB_PASS);
 $databases = [];
@@ -35,20 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
 
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
-
 <head>
     <?php require_once 'components/Header.php'; ?>
 </head>
-
 <body>
-
     <nav class="navbar navbar-dark bg-success shadow fixed-top">
         <div class="container">
             <h1 class="navbar-brand"><i class="fas fa-server"></i> phpMyLaragon</h1>
-            <div>
-                <span>Apache: <span id="apache-status">🔄 Checking...</span></span>
-                <span class="ms-3">MySQL: <span id="mysql-status">🔄 Checking...</span></span>
-            </div>
         </div>
     </nav>
 
@@ -56,13 +59,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
         <div class="p-4 bg-body-tertiary rounded">
             <h2>Welcome to phpMyLaragon! 🚀</h2>
             <p class="lead">Laragon web dashboard for web artisans.</p>
-            <button class="btn btn-primary rounded-pill px-3">Documentation</button>
-            <button class="btn btn-secondary rounded-pill px-3">Laragon Pro</button>
+            <a class="btn btn-primary rounded-pill px-3" href="https://phpmylaragon.vercel.app">Documentation</a>
         </div>
 
         <br />
 
         <div class="p-4 bg-body-tertiary rounded">
+            <h3>Server Status</h3>
+            <ul>
+                <li><strong>Apache:</strong>
+                    <span id="apache-status">🔄 Checking...</span>
+                </li>
+                <li><strong>MySQL:</strong>
+                    <span id="mysql-status">🔄 Checking...</span>
+                </li>
+                <li><strong>Redis:</strong>
+                    <span id="redis-status">🔄 Checking...</span>
+                </li>
+            </ul>
             <h3>Server Information</h3>
             <ul>
                 <li><strong>Webserver:</strong>
@@ -79,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
 
         <br />
 
-        <?php if (!empty($dirList)) : ?>
+        <?php if (!empty($filteredProjects)) : ?>
         <div class="p-4 bg-body-tertiary rounded">
             <h3>Your Projects (
                 <?php echo $totalProjects; ?>)
@@ -87,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
             <input type="text" id="search" class="form-control mb-3" placeholder="Search project...">
 
             <div class="row" id="project-list">
-                <?php foreach ($dirList as $value) : 
+                <?php foreach ($filteredProjects as $value) : 
                     $projectname = basename($value);
                     $link = 'http://localhost/' . $projectname;
                     $icon = '<i class="fas fa-folder"></i>';
@@ -115,9 +129,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
             <div class="d-flex gap-2">
                 <a href="http://localhost/phpmyadmin" class="btn btn-primary rounded-pill"><i
                         class="fas fa-database"></i> phpMyAdmin</a>
-                <a href="http://localhost/phpmylaragon/?q=info" class="btn btn-secondary rounded-pill"><i
+                <a href="http://localhost/phpmylaragon/?q=info" class="btn btn-primary rounded-pill"><i
                         class="fas fa-info-circle"></i> PHP Info</a>
-                <button class="btn btn-danger rounded-pill"><i class="fas fa-sync"></i> Restart Server</button>
+                <a href="http://localhost/laragon" class="btn btn-primary rounded-pill"><i
+                        class="fas fa-file"></i> File Uploader</a>
             </div>
         </div>
 
@@ -140,40 +155,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
         <div class="alert alert-warning">No databases found. Check your mysql server and try again!</div>
         <?php endif; ?>
     </main>
-
-    <script>
-        document.getElementById("search").addEventListener("keyup", function () {
-            let filter = this.value.toLowerCase();
-            let projects = document.getElementById("project-list").getElementsByClassName("col-md-4");
-            Array.from(projects).forEach(function (project) {
-                let title = project.textContent.toLowerCase();
-                prject.style.display = title.includes(filter) ? "block" : "none";
-            });
-        });
-    </script>
-    <script>
-        async function fetchServerStatus() {
-            try {
-                const response = await fetch('check_status.php');
-                const data = await response.json();
-
-                document.getElementById('apache-status').innerHTML =
-                    data.apache ? '<span class="badge bg-success">✅ Running</span>' :
-                        '<span class="badge bg-danger">❌ Stopped</span>';
-
-                document.getElementById('mysql-status').innerHTML =
-                    data.mysql ? '<span class="badge bg-success">✅ Running</span>' :
-                        '<span class="badge bg-danger">❌ Stopped</span>';
-            } catch (error) {
-                console.error("Error fetching status:", error);
-            }
-        }
-
-        setInterval(fetchServerStatus, 5000);
-        fetchServerStatus();
-    </script>
-
-
 </body>
-
 </html>
