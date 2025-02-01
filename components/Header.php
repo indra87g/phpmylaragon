@@ -2,6 +2,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="styles/main.css" />
 <link rel="stylesheet" href="styles/bootstrap.min.css" />
+<link rel="stylesheet" href="styles/sweetalert2.min.css">
 <link rel="stylesheet" href="styles/fontawesome/all.min.css" />
 
 <style>
@@ -21,6 +22,7 @@
 </style>
 
 <script src="scripts/bootstrap.bundle.min.js"></script>
+<script src="scripts/sweetalert2.all.min.js"></script>
 <script src="scripts/color-modes.js"></script>
 <script>
     document.getElementById("search").addEventListener("keyup", function () {
@@ -58,6 +60,26 @@
 
     setInterval(fetchServerStatus, 5000);
     fetchServerStatus();
+</script>
+<script>
+    function notImplementedAlert() {
+        Swal.fire({
+            icon: "error",
+            title: "Not Implemented Yet...",
+            text: "Check back later!",
+            showConfirmButton: true,
+        });
+    }
+
+    function actionSuccessAlert() {
+        Swal.fire({
+            icon: "success",
+            title: "Success!",
+            text: "Action executed successfully!",
+            showConfirmButton: false,
+            timer: 3500,
+        });  
+    }
 </script>
 
 <svg xmlns="http://www.w3.org/2000/svg" class="d-none">

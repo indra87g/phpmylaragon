@@ -55,11 +55,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
         </div>
     </nav>
 
+    <br />
+
     <main class="container mt-5">
         <div class="p-4 bg-body-tertiary rounded">
             <h2>Welcome to phpMyLaragon! 🚀</h2>
             <p class="lead">Laragon web dashboard for web artisans.</p>
             <a class="btn btn-primary rounded-pill px-3" href="https://phpmylaragon.vercel.app">Documentation</a>
+            <button class="btn btn-primary rounded-pill px-3" onclick="notImplementedAlert()" >What's New?</button>
         </div>
 
         <br />
@@ -143,13 +146,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
             <h2 class="mt-4">Databases</h2>
             <form class="mt-3" method="POST">
                 <input type="text" name="new_db" placeholder="New database name" required class="form-control"/>
-                <button type="submit" class="btn btn-primary mt-2">Create Database</button>
+                <button type="submit" class="btn btn-primary mt-2" onclick="actionSuccessAlert()">Create Database</button>
             </form><br />
-            <ul class="list-group">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
             <?php foreach ($databases as $db): ?>
-                <li class="list-group-item"><a href="<?php echo $DB_URL.$db; ?>" target="_blank"> <?php echo $db; ?> </a></li>
+                <tbody>
+                    <tr>
+                        <td><?php echo $db; ?></td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a class="btn btn-primary btn-sm" href="<?php echo $DB_URL.$db; ?>" target="_blank">Open</a>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-danger btn-sm" onclick="notImplementedAlert()">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
             <?php endforeach; ?>
-            </ul>
+            </table>
         </div>
         <?php else : ?>
         <div class="alert alert-warning">No databases found. Check your mysql server and try again!</div>
