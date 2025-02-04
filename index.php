@@ -49,11 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
     <?php require_once 'components/Header.php'; ?>
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-success shadow fixed-top">
-        <div class="container">
-            <h1 class="navbar-brand"><i class="fas fa-server"></i> phpMyLaragon</h1>
-        </div>
-    </nav>
+    <?php require_once 'components/Navbar.php' ?>
 
     <br />
 
@@ -67,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
 
         <br />
 
-        <div class="p-4 bg-body-tertiary rounded">
+        <div class="p-4 bg-body-tertiary rounded" id="server">
             <h3>Server Status</h3>
             <ul>
                 <li><strong>Apache:</strong>
@@ -97,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
         <br />
 
         <?php if (!empty($filteredProjects)) : ?>
-        <div class="p-4 bg-body-tertiary rounded">
+        <div class="p-4 bg-body-tertiary rounded" id="projects">
             <h3>Your Projects (
                 <?php echo $totalProjects; ?>)
             </h3>
@@ -127,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
 
         <br />
 
-        <div class="p-4 bg-body-tertiary rounded">
+        <div class="p-4 bg-body-tertiary rounded" id="toolbox">
             <h3>Toolbox</h3>
             <div class="d-flex gap-2">
                 <a href="http://localhost/phpmyadmin" class="btn btn-primary rounded-pill"><i
@@ -142,11 +138,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
         <br />
 
         <?php if (!empty($databases)) : ?>
-        <div class="p-4 bg-body-tertiary rounded">
+        <div class="p-4 bg-body-tertiary rounded" id="databases">
             <h2 class="mt-4">Databases</h2>
             <form class="mt-3" method="POST">
                 <input type="text" name="new_db" placeholder="New database name" required class="form-control"/>
-                <button type="submit" class="btn btn-primary mt-2" onclick="actionSuccessAlert()">Create Database</button>
+                <button type="submit" class="btn btn-primary mt-2">Create Database</button>
             </form><br />
             <table class="table table-hover">
                 <thead>
@@ -164,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
                                 <a class="btn btn-primary btn-sm" href="<?php echo $DB_URL.$db; ?>" target="_blank">Open</a>
                             </div>
                             <div class="btn-group" role="group">
-                                <button class="btn btn-danger btn-sm" onclick="notImplementedAlert()">Delete</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteDbAlert('<?php echo $db; ?>')">Delete</button>
                             </div>
                         </td>
                     </tr>
@@ -176,5 +172,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['new_db'])) {
         <div class="alert alert-warning">No databases found. Check your mysql server and try again!</div>
         <?php endif; ?>
     </main>
+
+    <br />
+
+    <?php require_once 'components/Footer.php'; ?>
 </body>
 </html>

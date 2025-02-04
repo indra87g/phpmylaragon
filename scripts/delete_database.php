@@ -1,9 +1,19 @@
 <?php
 require '../config.php';
 
-$conn = new mysqli($DB_HOST, $DB_USER, $DB_PASS);
-if ($conn->query("DROP DATABASE")) {
-    header("Location: index.php?db_deleted=1");
-    exit();
+if (!empty($_GET['db'])) {
+    $DB_NAME = $_GET['db'];
+
+    $conn = new mysqli($DB_HOST, $DB_USER, $DB_PASS);
+
+    if ($conn->connect_error) {
+        die("Connection failed: ".$conn->connect_error);
+    }
+    
+    if ($conn->query("DROP DATABASE `$DB_NAME`") === TRUE) {
+        echo "<meta http-equiv='refresh' content='1; url=http://localhost/phpmylaragon#databases'>success";
+    }
+
+    $conn->close();
 }
 ?>
