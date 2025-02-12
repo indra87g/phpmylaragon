@@ -4,16 +4,19 @@
 <link rel="stylesheet" href="styles/bootstrap.min.css" />
 <link rel="stylesheet" href="styles/sweetalert2.min.css">
 <link rel="stylesheet" href="styles/fontawesome/all.min.css" />
+<link rel="stylesheet" href="styles/simple-datatables.css">
 
 <style>
     .project-card {
         transition: 0.3s;
         border-radius: 12px;
     }
+
     .project-card:hover {
         transform: translateY(-5px);
         box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
     }
+
     .server-status {
         font-size: 14px;
         padding: 4px 10px;
@@ -23,7 +26,9 @@
 
 <script src="scripts/bootstrap.bundle.min.js"></script>
 <script src="scripts/sweetalert2.all.min.js"></script>
+<script src="scripts/simple-datatables.js"></script>
 <script src="scripts/color-modes.js"></script>
+<script src="scripts/datatables-simple-demo.js"></script>
 <script>
     document.getElementById("search").addEventListener("keyup", function () {
         let filter = this.value.toLowerCase();
@@ -32,11 +37,43 @@
             .getElementsByClassName("col-md-4");
         Array.from(projects).forEach(function (project) {
             let title = project.textContent.toLowerCase();
-            prject.style.display = title.includes(filter) ? "block" : "none";
+            project.style.display = title.includes(filter) ? "block" : "none";
         });
     });
 </script>
 <script>
+    async function fetchDeleteDb(db_name) {
+        try {
+            const response = await fetch(`scripts/delete_database.php?db=${db_name}`);
+            const data = await response.text();
+
+            if (data === "success") {
+                window.location.href = 'http://localhost/phpmylaragon#databases';
+                console.log(`Database ${db_name} deleted successfully`);
+                actionSuccessToast("Success!", `Database ${db_name} deleted successfully`, 3000);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            actionFailedToast("Failed!", "Error fetching data. see console for more info.", 3000)
+        }
+    }
+
+    async function fetchCreateDb(db_name) {
+        try {
+            const response = await fetch(`scripts/create_database.php?db=${db_name}`);
+            const data = await response.text();
+
+            if (data === "success") {
+                window.location.href = 'http://localhost/phpmylaragon#databases';
+                console.log(`Database ${db_name} created successfully`);
+                actionSuccessToast("Success!", `Database ${db_name} created successfully`, 3000);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            actionFailedToast("Failed!", "Error fetching data. see console for more info.", 3000)
+        }
+    }
+
     async function fetchServerStatus() {
         try {
             const response = await fetch("scripts/check_status.php");
@@ -62,27 +99,40 @@
     fetchServerStatus();
 </script>
 <script>
-    function notImplementedAlert() {
+    function notImplementedToast() {
         Swal.fire({
-            icon: "error",
+            toast: true,
+            position: "bottom-end",
+            background: "#212529",
+            color: '#DEE2E6',
+            icon: "question",
             title: "Not Implemented Yet...",
             text: "Check back later!",
-            showConfirmButton: true,
+            showConfirmButton: false,
+            timer: 3000
         });
     }
 
-    function actionSuccessAlert(title, text, timer) {
+    function actionSuccessToast(title, text, timer) {
         Swal.fire({
+            toast: true,
+            position: "top-start",
+            background: "#212529",
+            color: '#DEE2E6',
             icon: "success",
             title: title,
             text: text,
             showConfirmButton: false,
             timer: timer,
-        });  
+        });
     }
 
-    function actionFailedAlert(title, text, timer) {
+    function actionFailedToast(title, text, timer) {
         Swal.fire({
+            toast: true,
+            position: "top-start",
+            background: "#212529",
+            color: '#DEE2E6',
             icon: "alert",
             title: title,
             text: text,
@@ -91,9 +141,11 @@
         });
     }
 
-    function actionAskAlert(title, text, confirm_button, cancel_button, deleteDb, Db) {
+    function actionAskAlert(title, text, confirm_button, cancel_button, deleteDb, createDb, Db) {
         if (deleteDb === true) {
             Swal.fire({
+                background: "#212529",
+                color: '#DEE2E6',
                 icon: "question",
                 title: title,
                 text: text,
@@ -102,9 +154,23 @@
                 cancelButtonText: cancel_button,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = `scripts/delete_database.php?db=${Db}` ;
+                    fetchDeleteDb(Db);
                 }
-            });   
+            });
+        } else if (createDb === true) {
+            Swal.fire({
+                background: "#212529",
+                color: '#DEE2E6',
+                icon: "question",
+                title: "Enter database name",
+                input: "text",
+                inputPlaceholder: "Enter database name here",
+                showCancelButton: true,
+            }).then((result) => {
+                if (result.value) {
+                    fetchCreateDb(result.value);
+                }
+            })
         } else {
             Swal.fire({
                 icon: "question",
@@ -124,7 +190,20 @@
             "Yes",
             "No",
             true,
+            false,
             db_name
+        )
+    }
+
+    function createDbAlert() {
+        actionAskAlert(
+            "",
+            "",
+            "",
+            "",
+            false,
+            true,
+            ""
         )
     }
 </script>

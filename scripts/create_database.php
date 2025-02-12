@@ -1,5 +1,5 @@
 <?php
-require '../config.php';
+require "../config.php";
 
 if (!empty($_GET['db'])) {
     $DB_NAME = $_GET['db'];
@@ -10,10 +10,9 @@ if (!empty($_GET['db'])) {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    if ($conn->query("DROP DATABASE `$DB_NAME`") === TRUE) {
+    if ($conn->query("CREATE DATABASE `$DB_NAME`") === TRUE) {
         echo "success";
     }
 
     $conn->close();
 }
-?>

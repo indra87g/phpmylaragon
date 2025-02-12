@@ -1,7 +1,8 @@
 <?php
 header('Content-Type: application/json');
 
-function isServiceRunning($host, $port) {
+function isServiceRunning($host, $port)
+{
     $connection = @fsockopen($host, $port);
     if (is_resource($connection)) {
         fclose($connection);
