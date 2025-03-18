@@ -1,5 +1,7 @@
 # phpMyLaragon
 
+![Preview](https://ik.imagekit.io/vmimm0jfp/indra87g/project/phpmylaragon.png)
+
 A simple yet web dashboard for Laragon webserver.
 
 ## Features

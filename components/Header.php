@@ -30,25 +30,12 @@
 <script src="scripts/color-modes.js"></script>
 <script src="scripts/datatables-simple-demo.js"></script>
 <script>
-    document.getElementById("search").addEventListener("keyup", function () {
-        let filter = this.value.toLowerCase();
-        let projects = document
-            .getElementById("project-list")
-            .getElementsByClassName("col-md-4");
-        Array.from(projects).forEach(function (project) {
-            let title = project.textContent.toLowerCase();
-            project.style.display = title.includes(filter) ? "block" : "none";
-        });
-    });
-</script>
-<script>
     async function fetchDeleteDb(db_name) {
         try {
             const response = await fetch(`scripts/delete_database.php?db=${db_name}`);
             const data = await response.text();
 
             if (data === "success") {
-                window.location.href = 'http://localhost/phpmylaragon#databases';
                 console.log(`Database ${db_name} deleted successfully`);
                 actionSuccessToast("Success!", `Database ${db_name} deleted successfully`, 3000);
             }
@@ -64,13 +51,23 @@
             const data = await response.text();
 
             if (data === "success") {
-                window.location.href = 'http://localhost/phpmylaragon#databases';
                 console.log(`Database ${db_name} created successfully`);
                 actionSuccessToast("Success!", `Database ${db_name} created successfully`, 3000);
             }
         } catch (error) {
             console.error("Error fetching data:", error);
             actionFailedToast("Failed!", "Error fetching data. see console for more info.", 3000)
+        }
+    }
+
+    async function fetchDatetime() {
+        try {
+            const response = await fetch("scripts/datetime.php");
+            const data = await response.text();
+
+            document.getElementById("datetime").innerHTML = `<strong>Time:</strong> ${data}`
+        } catch (error) {
+            console.log("Error fetching data:", error)
         }
     }
 
@@ -83,6 +80,10 @@
                 ? '<span class="badge bg-success">✅ Running</span>'
                 : '<span class="badge bg-danger">❌ Stopped</span>';
 
+            document.getElementById("nginx-status").innerHTML = data.nginx
+                ? '<span class="badge bg-success">✅ Running</span>'
+                : '<span class="badge bg-danger">❌ Stopped</span>';
+
             document.getElementById("mysql-status").innerHTML = data.mysql
                 ? '<span class="badge bg-success">✅ Running</span>'
                 : '<span class="badge bg-danger">❌ Stopped</span>';
@@ -90,19 +91,30 @@
             document.getElementById("redis-status").innerHTML = data.redis
                 ? '<span class="badge bg-success">✅ Running</span>'
                 : '<span class="badge bg-danger">❌ Stopped</span>';
+
+            document.getElementById("apache-status").innerHTML = data.apache
+                ? '<span class="badge bg-success">✅ Running</span>'
+                : '<span class="badge bg-danger">❌ Stopped</span>';
+
+            document.getElementById("memcached-status").innerHTML = data.memcached
+                ? '<span class="badge bg-success">✅ Running</span>'
+                : '<span class="badge bg-danger">❌ Stopped</span>';
+
         } catch (error) {
             console.error("Error fetching status:", error);
         }
     }
 
+    setInterval(fetchDatetime, 1000);
     setInterval(fetchServerStatus, 5000);
+    window.onload = fetchDatetime();
     fetchServerStatus();
 </script>
 <script>
     function notImplementedToast() {
         Swal.fire({
             toast: true,
-            position: "bottom-end",
+            position: "top-start",
             background: "#212529",
             color: '#DEE2E6',
             icon: "question",
@@ -124,7 +136,9 @@
             text: text,
             showConfirmButton: false,
             timer: timer,
-        });
+        }).then(() => {
+            window.location.href = 'http://localhost/phpmylaragon';
+        })
     }
 
     function actionFailedToast(title, text, timer) {

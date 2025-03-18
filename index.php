@@ -51,7 +51,7 @@ if (!$conn->connect_error) {
         <div class="p-4 bg-body-tertiary rounded">
             <h2>Welcome to phpMyLaragon! 🚀</h2>
             <p class="lead">Laragon web dashboard for web artisans.</p>
-            <a class="btn btn-primary rounded-pill px-3" href="https://phpmylaragon.vercel.app">Documentation</a>
+            <a class="btn btn-primary rounded-pill px-3" href="https://ohmylaragon.vercel.app/phpmylaragon">Documentation</a>
             <button class="btn btn-primary rounded-pill px-3" onclick="notImplementedToast()">What's New?</button>
             <button type="button" class="btn btn-primary rounded-pill px-3" data-bs-toggle="modal"
                 data-bs-target="#toolboxModal">
@@ -66,15 +66,24 @@ if (!$conn->connect_error) {
                 <li><strong>Apache:</strong>
                     <span id="apache-status">🔄 Checking...</span>
                 </li>
+                <li><strong>Nginx:</strong>
+                    <span id="nginx-status">🔄 Checking...</span>
+                </li>
                 <li><strong>MySQL:</strong>
                     <span id="mysql-status">🔄 Checking...</span>
                 </li>
                 <li><strong>Redis:</strong>
                     <span id="redis-status">🔄 Checking...</span>
                 </li>
+                <li><strong>Memcached:</strong>
+                    <span id="memcached-status">🔄 Checking...</span>
+                </li>
             </ul>
             <h3>Server Information</h3>
             <ul>
+                <li><strong>OS:</strong>
+                    <?php echo php_uname(); ?>
+                </li>
                 <li><strong>Webserver:</strong>
                     <?php echo $_SERVER['SERVER_SOFTWARE']; ?>
                 </li>
@@ -87,10 +96,9 @@ if (!$conn->connect_error) {
                 <li><strong>Server IP:</strong>
                     <?php echo gethostbyname(gethostname()); ?>:<?php echo $_SERVER['SERVER_PORT']; ?>
                 </li>
-                <li><strong>Time:</strong>
-                    <?php echo date("Y-m-d H:i:s"); ?>
-                </li>
+                <li id="datetime"></li>
             </ul>
+        </div>
         </div>
 
         <br />
@@ -100,6 +108,7 @@ if (!$conn->connect_error) {
                 <h3>Your Projects (
                     <?php echo $totalProjects; ?>)
                 </h3>
+                <!-- Coming Soon -->
                 <input type="text" id="search" class="form-control mb-3" placeholder="Search project...">
 
                 <div class="row" id="project-list">

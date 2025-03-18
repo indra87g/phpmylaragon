@@ -13,9 +13,10 @@ function isServiceRunning($host, $port)
 
 $response = [
     'apache' => isServiceRunning('localhost', 80),
+    'nginx' => isServiceRunning('localhost', 8080),
     'mysql' => isServiceRunning('localhost', 3306),
     'redis' => isServiceRunning('localhost', 6379),
-    'pocketbase' => isServiceRunning('localhost', 8090),
+    'memcached' => isServiceRunning('localhost', 11211),
 ];
 
 echo json_encode($response);
